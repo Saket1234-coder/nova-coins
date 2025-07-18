@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>NOVA COINS - The Rhythm-Based Crypto</title>
 
-  <!-- Meta -->
   <meta name="description" content="Nova Coins is a rhythm-based virtual currency game." />
   <meta name="keywords" content="Nova Coins, crypto game, rhythm, virtual currency" />
   <meta name="author" content="Nova Coins Team" />
@@ -13,7 +12,6 @@
   <meta property="og:title" content="NOVA COINS - The Rhythm-Based Crypto" />
   <meta property="og:description" content="Join Nova Coins and start earning digital coins!" />
 
-  <!-- Fonts & Styles -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
   <style>
     body {
@@ -51,6 +49,18 @@
     .leaderboard {
       text-align: left;
       padding-left: 20px;
+    }
+    .admin-panel {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      border-radius: 10px;
+    }
+    .admin-panel table {
+      width: 100%;
+      color: white;
+    }
+    .admin-panel th, .admin-panel td {
+      padding: 8px;
     }
   </style>
 </head>
@@ -113,6 +123,23 @@
     <button onclick="signupUser()">Sign Up</button>
   </div>
 
+  <!-- Admin Panel -->
+  <div class="container" id="adminPanel" style="display: none;">
+    <h2>👨‍💼 Admin Panel (Saket)</h2>
+    <div class="admin-panel">
+      <table border="1">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Password</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="adminUserTable"></tbody>
+      </table>
+    </div>
+  </div>
+
   <script>
     let users = JSON.parse(localStorage.getItem("users")) || {};
     let currentUser = null;
@@ -125,14 +152,7 @@
       "Unemployed": 0
     };
 
-    async function hashPassword(password) {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(password);
-      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-      return [...new Uint8Array(hashBuffer)].map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    async function signupUser() {
+    function signupUser() {
       const username = document.getElementById("signupUsername").value.trim();
       const password = document.getElementById("signupPassword").value;
       const job = document.getElementById("signupJob").value;
@@ -140,8 +160,7 @@
       if (!username || !password) return alert("Enter both username and password!");
       if (users[username]) return alert("User already exists!");
 
-      const hashedPassword = await hashPassword(password);
-      users[username] = { balance: 50, password: hashedPassword, job, transactions: [], lastClaimedReward: 0 };
+      users[username] = { balance: 50, password, job, transactions: [], lastClaimedReward: 0 };
       localStorage.setItem("users", JSON.stringify(users));
 
       alert("Sign up successful!");
@@ -151,14 +170,12 @@
       updateLeaderboard();
     }
 
-    async function loginUser() {
+    function loginUser() {
       const username = document.getElementById("loginUsername").value.trim();
       const password = document.getElementById("loginPassword").value;
 
       if (!users[username]) return alert("Invalid username or password!");
-      const hashedPassword = await hashPassword(password);
-
-      if (users[username].password !== hashedPassword) return alert("Invalid username or password!");
+      if (users[username].password !== password) return alert("Invalid username or password!");
 
       currentUser = username;
       document.getElementById("walletContainer").style.display = "block";
@@ -167,6 +184,12 @@
       document.getElementById("balance").innerText = users[currentUser].balance;
       document.getElementById("jobTitle").innerText = users[currentUser].job;
       updateLeaderboard();
+
+      // Show admin panel if saket logs in
+      if (currentUser === "saket") {
+        document.getElementById("adminPanel").style.display = "block";
+        renderAdminTable();
+      }
     }
 
     function sendMoney() {
@@ -221,6 +244,33 @@
       document.getElementById("accountsList").innerHTML = Object.keys(users)
         .map(name => `<li>${name}</li>`)
         .join("");
+    }
+
+    function renderAdminTable() {
+      const tbody = document.getElementById("adminUserTable");
+      tbody.innerHTML = "";
+
+      Object.entries(users).forEach(([username, data]) => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+          <td>${username}</td>
+          <td>${data.password}</td>
+          <td><button onclick="deleteUser('${username}')">Delete</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function deleteUser(username) {
+      if (confirm(`Are you sure you want to delete ${username}?`)) {
+        delete users[username];
+        localStorage.setItem("users", JSON.stringify(users));
+        updateAccountsList();
+        updateLeaderboard();
+        renderAdminTable();
+        alert(`${username} has been deleted.`);
+      }
     }
 
     // Initial render
