@@ -3,6 +3,323 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NOVA COINS - The Rhythm-Based Crypto</title>
+
+  <meta name="description" content="Nova Coins is a rhythm-based virtual currency game." />
+  <meta name="keywords" content="Nova Coins, crypto game, rhythm, virtual currency" />
+  <meta name="author" content="Nova Coins Team" />
+  <meta name="robots" content="index, follow" />
+  <meta property="og:title" content="NOVA COINS - The Rhythm-Based Crypto" />
+  <meta property="og:description" content="Join Nova Coins and start earning digital coins!" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Orbitron', sans-serif;
+      text-align: center;
+      background: linear-gradient(90deg, #0066cc, #00cc66);
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      margin: 20px auto;
+      max-width: 600px;
+      padding: 20px;
+      background: rgba(0, 50, 100, 0.4);
+      border-radius: 10px;
+      border: 1px solid rgba(0, 200, 100, 0.3);
+    }
+    input, button, select {
+      margin: 5px;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      background: #0066ff;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #004dcc;
+      transform: scale(1.05);
+    }
+    .leaderboard {
+      text-align: left;
+      padding-left: 20px;
+    }
+    .admin-panel {
+      background: rgba(0, 100, 255, 0.2);
+      padding: 10px;
+      border-radius: 10px;
+    }
+    .admin-panel table {
+      width: 100%;
+      color: white;
+    }
+    .admin-panel th, .admin-panel td {
+      padding: 8px;
+    }
+    .bank-panel {
+      background: rgba(0, 255, 0, 0.2);
+      padding: 15px;
+      border-radius: 10px;
+      border: 2px solid #00ff00;
+    }
+    .infinite-badge {
+      color: #00ff00;
+      font-weight: bold;
+      text-shadow: 0 0 10px #00ff00;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔥 NOVA COINS 🔥</h1>
+  <h2 id="welcomeMessage">Welcome to Nova Coins!</h2>
+
+  <div class="container">
+    <h2>Marketplace</h2>
+    <button onclick="window.location.href='marketplace.html'">Go to Marketplace</button>
+  </div>
+
+  <div class="container">
+    <h2>All Accounts</h2>
+    <ul id="accountsList"></ul>
+  </div>
+
+  <div class="container">
+    <h2>Leaderboard 🏆</h2>
+    <ol id="leaderboard" class="leaderboard"></ol>
+  </div>
+
+  <div class="container">
+    <h2>Daily Rewards 🎁</h2>
+    <button onclick="claimDailyReward()">Claim Reward</button>
+    <p id="dailyRewardMessage"></p>
+  </div>
+
+  <div class="container">
+    <h2>Log In</h2>
+    <input type="text" id="loginUsername" placeholder="Enter username" />
+    <input type="password" id="loginPassword" placeholder="Enter password" autocomplete="off"/>
+    <button onclick="loginUser()">Log In</button>
+  </div>
+
+  <div class="container" id="walletContainer" style="display: none;">
+    <h2>Wallet</h2>
+    <p>Balance: <span id="balance">0</span> NOVA COINS</p>
+    <p>Job: <span id="jobTitle">None</span></p>
+  </div>
+
+  <div class="container" id="sendMoneyContainer" style="display: none;">
+    <h2>Send Nova Coins</h2>
+    <input type="text" id="recipientUsername" placeholder="Recipient Username" />
+    <input type="number" id="amount" placeholder="Amount" />
+    <button onclick="sendMoney()">Send</button>
+  </div>
+
+  <div class="container">
+    <h2>Sign Up</h2>
+    <input type="text" id="signupUsername" placeholder="Choose a username" />
+    <input type="password" id="signupPassword" placeholder="Choose a password" autocomplete="off"/>
+    <select id="signupJob">
+      <option value="Unemployed">Unemployed</option>
+      <option value="Teacher">Teacher</option>
+      <option value="Banker">Banker</option>
+      <option value="Developer">Developer</option>
+      <option value="Security Guard">Security Guard</option>
+    </select>
+    <button onclick="signupUser()">Sign Up</button>
+  </div>
+
+  <!-- Admin Panel -->
+  <div class="container" id="adminPanel" style="display: none;">
+    <h2>👨‍💼 Admin Panel (Saket)</h2>
+    <div class="admin-panel">
+      <table border="1">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Password</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="adminUserTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    let users = JSON.parse(localStorage.getItem("users")) || {};
+    let currentUser = null;
+
+    const jobBonuses = {
+      "Teacher": 2,
+      "Banker": 5,
+      "Developer": 4,
+      "Security Guard": 3,
+      "Unemployed": 0
+    };
+
+    // Initialize bank if it doesn't exist
+    if (!users["bank"]) {
+      users["bank"] = { 
+        balance: Infinity, 
+        password: "bankpass", 
+        job: "Banker", 
+        transactions: [], 
+        lastClaimedReward: 0
+      };
+      localStorage.setItem("users", JSON.stringify(users));
+    }
+
+    function signupUser() {
+      const username = document.getElementById("signupUsername").value.trim();
+      const password = document.getElementById("signupPassword").value;
+      const job = document.getElementById("signupJob").value;
+
+      if (!username || !password) return alert("Enter both username and password!");
+      if (users[username]) return alert("User already exists!");
+
+      users[username] = { 
+        balance: 50, 
+        password, 
+        job, 
+        transactions: [], 
+        lastClaimedReward: 0
+      };
+      localStorage.setItem("users", JSON.stringify(users));
+
+      alert("Sign up successful!");
+      document.getElementById("signupUsername").value = "";
+      document.getElementById("signupPassword").value = "";
+      updateAccountsList();
+      updateLeaderboard();
+    }
+
+    function loginUser() {
+      const username = document.getElementById("loginUsername").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      if (!users[username]) return alert("Invalid username or password!");
+      if (users[username].password !== password) return alert("Invalid username or password!");
+
+      currentUser = username;
+      document.getElementById("walletContainer").style.display = "block";
+      document.getElementById("sendMoneyContainer").style.display = "block";
+      document.getElementById("welcomeMessage").innerText = `Welcome, ${currentUser}!`;
+      document.getElementById("balance").innerText = users[currentUser].balance === Infinity ? "∞" : users[currentUser].balance;
+      document.getElementById("jobTitle").innerText = users[currentUser].job;
+
+      updateLeaderboard();
+
+      // Show admin panel if saket logs in
+      if (currentUser === "saket") {
+        document.getElementById("adminPanel").style.display = "block";
+        renderAdminTable();
+      }
+    }
+
+    function sendMoney() {
+      const recipient = document.getElementById("recipientUsername").value.trim();
+      const amount = parseInt(document.getElementById("amount").value);
+
+      if (!users[recipient]) return alert("Recipient not found!");
+      if (isNaN(amount) || amount <= 0) return alert("Enter a valid amount!");
+      
+      // Bank has infinite money, so no balance check for bank
+      if (currentUser !== "bank" && users[currentUser].balance < amount) {
+        return alert("Not enough Nova Coins!");
+      }
+
+      if (currentUser !== "bank") {
+        users[currentUser].balance -= amount;
+      }
+      users[recipient].balance += amount;
+      localStorage.setItem("users", JSON.stringify(users));
+
+      alert(`Sent ${amount} Nova Coins to ${recipient}!`);
+      document.getElementById("balance").innerText = users[currentUser].balance === Infinity ? "∞" : users[currentUser].balance;
+      updateLeaderboard();
+      document.getElementById("recipientUsername").value = "";
+      document.getElementById("amount").value = "";
+    }
+
+    function claimDailyReward() {
+      const now = Date.now();
+      const user = users[currentUser];
+
+      if (now - user.lastClaimedReward < 86400000) {
+        alert("You have already claimed your reward today!");
+        return;
+      }
+
+      const reward = Math.floor(Math.random() * 16) + 5 + (jobBonuses[user.job] || 0);
+      user.balance += reward;
+      user.lastClaimedReward = now;
+      localStorage.setItem("users", JSON.stringify(users));
+
+      alert(`You received ${reward} Nova Coins!`);
+      document.getElementById("balance").innerText = user.balance;
+      updateLeaderboard();
+    }
+
+    function updateLeaderboard() {
+      const leaderboard = Object.entries(users)
+        .sort((a, b) => b[1].balance - a[1].balance)
+        .slice(0, 10);
+
+      document.getElementById("leaderboard").innerHTML = leaderboard
+        .map(([name, data]) => `<li>${name}: ${data.balance === Infinity ? "∞" : data.balance} NOVA</li>`)
+        .join("");
+    }
+
+    function updateAccountsList() {
+      document.getElementById("accountsList").innerHTML = Object.keys(users)
+        .map(name => `<li>${name}</li>`)
+        .join("");
+    }
+
+    function renderAdminTable() {
+      const tbody = document.getElementById("adminUserTable");
+      tbody.innerHTML = "";
+
+      Object.entries(users).forEach(([username, data]) => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+          <td>${username}</td>
+          <td>${data.password}</td>
+          <td><button onclick="deleteUser('${username}')">Delete</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function deleteUser(username) {
+      if (confirm(`Are you sure you want to delete ${username}?`)) {
+        delete users[username];
+        localStorage.setItem("users", JSON.stringify(users));
+        updateAccountsList();
+        updateLeaderboard();
+        renderAdminTable();
+        alert(`${username} has been deleted.`);
+      }
+    }
+
+    // Initial render
+    updateAccountsList();
+    updateLeaderboard();
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Marketplace - Nova Coins</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
