@@ -3,81 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>NOVA COINS - The Rhythm-Based Crypto</title>
-
-  <meta name="description" content="Nova Coins is a rhythm-based virtual currency game." />
-  <meta name="keywords" content="Nova Coins, crypto game, rhythm, virtual currency" />
-  <meta name="author" content="Nova Coins Team" />
-  <meta name="robots" content="index, follow" />
-  <meta property="og:title" content="NOVA COINS - The Rhythm-Based Crypto" />
-  <meta property="og:description" content="Join Nova Coins and start earning digital coins!" />
-
+  <title>NOVA COINS 2.0</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
   <style>
-    body {
-      font-family: 'Orbitron', sans-serif;
-      text-align: center;
-      background: linear-gradient(90deg, #0066cc, #00cc66);
-      color: white;
-      margin: 0;
-      padding: 20px;
-    }
-    .container {
-      margin: 20px auto;
-      max-width: 600px;
-      padding: 20px;
-      background: rgba(0, 50, 100, 0.4);
-      border-radius: 10px;
-      border: 1px solid rgba(0, 200, 100, 0.3);
-    }
-    input, button, select {
-      margin: 5px;
-      padding: 10px;
-      font-size: 1rem;
-      border-radius: 5px;
-      border: none;
-    }
-    button {
-      background: #0066ff;
-      color: white;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover {
-      background: #004dcc;
-      transform: scale(1.05);
-    }
-    .leaderboard {
-      text-align: left;
-      padding-left: 20px;
-    }
-    .admin-panel {
-      background: rgba(0, 100, 255, 0.2);
-      padding: 10px;
-      border-radius: 10px;
-    }
-    .admin-panel table {
-      width: 100%;
-      color: white;
-    }
-    .admin-panel th, .admin-panel td {
-      padding: 8px;
-    }
-    .bank-panel {
-      background: rgba(0, 255, 0, 0.2);
-      padding: 15px;
-      border-radius: 10px;
-      border: 2px solid #00ff00;
-    }
-    .infinite-badge {
-      color: #00ff00;
-      font-weight: bold;
-      text-shadow: 0 0 10px #00ff00;
-    }
+    body { font-family: 'Orbitron', sans-serif; text-align: center;
+      background: linear-gradient(90deg, #0066cc, #00cc66); color: white;
+      margin: 0; padding: 20px; }
+    .container { margin: 20px auto; max-width: 600px;
+      padding: 20px; background: rgba(0,50,100,0.4); border-radius: 10px;
+      border: 1px solid rgba(0,200,100,0.3); }
+    input, button, select { margin: 5px; padding: 10px; font-size: 1rem;
+      border-radius: 5px; border: none; }
+    button { background: #0066ff; color: white; cursor: pointer;
+      transition: 0.3s; }
+    button:hover { background: #004dcc; transform: scale(1.05); }
+    .leaderboard { text-align:left; padding-left:20px; }
+    .admin-panel table { width:100%; color:white; }
+    .admin-panel th, td { padding:8px; }
+    #balance { font-size:1.5rem; font-weight:bold; min-width:100px; display:inline-block; }
   </style>
 </head>
 <body>
-  <h1>🔥 NOVA COINS 🔥</h1>
+  <h1>🔥 NOVA COINS 2.0 🔥</h1>
   <h2 id="welcomeMessage">Welcome to Nova Coins!</h2>
 
   <div class="container">
@@ -95,224 +42,217 @@
     <ol id="leaderboard" class="leaderboard"></ol>
   </div>
 
-  <div class="container">
-    <h2>Daily Rewards 🎁</h2>
-    <button onclick="claimDailyReward()">Claim Reward</button>
-    <p id="dailyRewardMessage"></p>
-  </div>
-
-  <div class="container">
-    <h2>Log In</h2>
+  <div class="container" id="loginSignup">
+    <h2>Log In / Sign Up</h2>
     <input type="text" id="loginUsername" placeholder="Enter username" />
     <input type="password" id="loginPassword" placeholder="Enter password" autocomplete="off"/>
-    <button onclick="loginUser()">Log In</button>
-  </div>
-
-  <div class="container" id="walletContainer" style="display: none;">
-    <h2>Wallet</h2>
-    <p>Balance: <span id="balance">0</span> NOVA COINS</p>
-    <p>Job: <span id="jobTitle">None</span></p>
-  </div>
-
-  <div class="container" id="sendMoneyContainer" style="display: none;">
-    <h2>Send Nova Coins</h2>
-    <input type="text" id="recipientUsername" placeholder="Recipient Username" />
-    <input type="number" id="amount" placeholder="Amount" />
-    <button onclick="sendMoney()">Send</button>
-  </div>
-
-  <div class="container">
-    <h2>Sign Up</h2>
-    <input type="text" id="signupUsername" placeholder="Choose a username" />
-    <input type="password" id="signupPassword" placeholder="Choose a password" autocomplete="off"/>
-    <select id="signupJob">
+    <button onclick="loginOrSignup()">Continue</button>
+    <select id="signupJob" style="margin-top:10px;">
       <option value="Unemployed">Unemployed</option>
       <option value="Teacher">Teacher</option>
       <option value="Banker">Banker</option>
       <option value="Developer">Developer</option>
       <option value="Security Guard">Security Guard</option>
     </select>
-    <button onclick="signupUser()">Sign Up</button>
   </div>
 
-  <!-- Admin Panel -->
-  <div class="container" id="adminPanel" style="display: none;">
+  <div class="container" id="walletContainer" style="display:none;">
+    <h2>Wallet</h2>
+    <p>Balance: <span id="balance">0</span> NOVA COINS</p>
+    <p>Job: <span id="jobTitle">None</span></p>
+    <button onclick="claimDailyReward()">Claim Daily Reward</button>
+    <button onclick="playMiniGame()">Mini‑Game</button>
+    <button onclick="viewQuests()">Quests</button>
+  </div>
+
+  <div class="container" id="sendMoneyContainer" style="display:none;">
+    <h2>Send Nova Coins</h2>
+    <input type="text" id="recipientUsername" placeholder="Recipient Username" />
+    <input type="number" id="amount" placeholder="Amount" />
+    <button onclick="sendMoney()">Send</button>
+  </div>
+
+  <div class="container" id="questContainer" style="display:none;">
+    <h2>Quests</h2>
+    <ul id="questList"></ul>
+    <button onclick="closeQuests()">Close Quests</button>
+  </div>
+
+  <div class="container" id="historyContainer" style="display:none;">
+    <h2>Transaction History</h2>
+    <ul id="historyList"></ul>
+    <button onclick="toggleHistory()">Toggle History</button>
+  </div>
+
+  <div class="container" id="adminPanel" style="display:none;">
     <h2>👨‍💼 Admin Panel (Saket)</h2>
     <div class="admin-panel">
       <table border="1">
-        <thead>
-          <tr>
-            <th>Username</th>
-            <th>Password</th>
-            <th>Action</th>
-          </tr>
-        </thead>
+        <thead><tr><th>Username</th><th>Password</th><th>Action</th></tr></thead>
         <tbody id="adminUserTable"></tbody>
       </table>
     </div>
   </div>
 
-  <script>
-    let users = JSON.parse(localStorage.getItem("users")) || {};
-    let currentUser = null;
+<script>
+let users = JSON.parse(localStorage.getItem('users')) || {};
+let currentUser = null;
+const jobBonuses = {Teacher:2,Banker:5,Developer:4,"Security Guard":3,Unemployed:0};
 
-    const jobBonuses = {
-      "Teacher": 2,
-      "Banker": 5,
-      "Developer": 4,
-      "Security Guard": 3,
-      "Unemployed": 0
-    };
+if (!users["bank"]) {
+  users["bank"] = {balance:Infinity,password:"bankpass",job:"Banker",transactions:[],lastClaimedReward:0,history:[],streak:0};
+  save();
+}
 
-    // Initialize bank if it doesn't exist
-    if (!users["bank"]) {
-      users["bank"] = { 
-        balance: Infinity, 
-        password: "zxcv", 
-        job: "Banker", 
-        transactions: [], 
-        lastClaimedReward: 0
-      };
-      localStorage.setItem("users", JSON.stringify(users));
-    }
+function save(){ localStorage.setItem('users', JSON.stringify(users)); }
 
-    function signupUser() {
-      const username = document.getElementById("signupUsername").value.trim();
-      const password = document.getElementById("signupPassword").value;
-      const job = document.getElementById("signupJob").value;
+function updateAccountsList(){
+  accountsList.innerHTML = Object.keys(users).map(n=>`<li>${n}</li>`).join('');
+}
+function updateLeaderboard(){
+  const top = Object.entries(users)
+    .sort((a,b)=> (b[1].balance===Infinity?1:b[1].balance)-(a[1].balance===Infinity?1:a[1].balance))
+    .slice(0,10);
+  leaderboard.innerHTML = top.map(([n,u])=>`<li>${n}: ${u.balance===Infinity?"∞":u.balance} NOVA</li>`).join('');
+}
 
-      if (!username || !password) return alert("Enter both username and password!");
-      if (users[username]) return alert("User already exists!");
-
-      users[username] = { 
-        balance: 50, 
-        password, 
-        job, 
-        transactions: [], 
-        lastClaimedReward: 0
-      };
-      localStorage.setItem("users", JSON.stringify(users));
-
-      alert("Sign up successful!");
-      document.getElementById("signupUsername").value = "";
-      document.getElementById("signupPassword").value = "";
-      updateAccountsList();
-      updateLeaderboard();
-    }
-
-    function loginUser() {
-      const username = document.getElementById("loginUsername").value.trim();
-      const password = document.getElementById("loginPassword").value;
-
-      if (!users[username]) return alert("Invalid username or password!");
-      if (users[username].password !== password) return alert("Invalid username or password!");
-
-      currentUser = username;
-      document.getElementById("walletContainer").style.display = "block";
-      document.getElementById("sendMoneyContainer").style.display = "block";
-      document.getElementById("welcomeMessage").innerText = `Welcome, ${currentUser}!`;
-      document.getElementById("balance").innerText = users[currentUser].balance === Infinity ? "∞" : users[currentUser].balance;
-      document.getElementById("jobTitle").innerText = users[currentUser].job;
-
-      updateLeaderboard();
-
-      // Show admin panel if saket logs in
-      if (currentUser === "saket") {
-        document.getElementById("adminPanel").style.display = "block";
-        renderAdminTable();
-      }
-    }
-
-    function sendMoney() {
-      const recipient = document.getElementById("recipientUsername").value.trim();
-      const amount = parseInt(document.getElementById("amount").value);
-
-      if (!users[recipient]) return alert("Recipient not found!");
-      if (isNaN(amount) || amount <= 0) return alert("Enter a valid amount!");
-      
-      // Bank has infinite money, so no balance check for bank
-      if (currentUser !== "bank" && users[currentUser].balance < amount) {
-        return alert("Not enough Nova Coins!");
-      }
-
-      if (currentUser !== "bank") {
-        users[currentUser].balance -= amount;
-      }
-      users[recipient].balance += amount;
-      localStorage.setItem("users", JSON.stringify(users));
-
-      alert(`Sent ${amount} Nova Coins to ${recipient}!`);
-      document.getElementById("balance").innerText = users[currentUser].balance === Infinity ? "∞" : users[currentUser].balance;
-      updateLeaderboard();
-      document.getElementById("recipientUsername").value = "";
-      document.getElementById("amount").value = "";
-    }
-
-    function claimDailyReward() {
-      const now = Date.now();
-      const user = users[currentUser];
-
-      if (now - user.lastClaimedReward < 86400000) {
-        alert("You have already claimed your reward today!");
-        return;
-      }
-
-      const reward = Math.floor(Math.random() * 16) + 5 + (jobBonuses[user.job] || 0);
-      user.balance += reward;
-      user.lastClaimedReward = now;
-      localStorage.setItem("users", JSON.stringify(users));
-
-      alert(`You received ${reward} Nova Coins!`);
-      document.getElementById("balance").innerText = user.balance;
-      updateLeaderboard();
-    }
-
-    function updateLeaderboard() {
-      const leaderboard = Object.entries(users)
-        .sort((a, b) => b[1].balance - a[1].balance)
-        .slice(0, 10);
-
-      document.getElementById("leaderboard").innerHTML = leaderboard
-        .map(([name, data]) => `<li>${name}: ${data.balance === Infinity ? "∞" : data.balance} NOVA</li>`)
-        .join("");
-    }
-
-    function updateAccountsList() {
-      document.getElementById("accountsList").innerHTML = Object.keys(users)
-        .map(name => `<li>${name}</li>`)
-        .join("");
-    }
-
-    function renderAdminTable() {
-      const tbody = document.getElementById("adminUserTable");
-      tbody.innerHTML = "";
-
-      Object.entries(users).forEach(([username, data]) => {
-        const row = document.createElement("tr");
-
-        row.innerHTML = `
-          <td>${username}</td>
-          <td>${data.password}</td>
-          <td><button onclick="deleteUser('${username}')">Delete</button></td>
-        `;
-        tbody.appendChild(row);
-      });
-    }
-
-    function deleteUser(username) {
-      if (confirm(`Are you sure you want to delete ${username}?`)) {
-        delete users[username];
-        localStorage.setItem("users", JSON.stringify(users));
-        updateAccountsList();
-        updateLeaderboard();
-        renderAdminTable();
-        alert(`${username} has been deleted.`);
-      }
-    }
-
-    // Initial render
+function loginOrSignup(){
+  const u=loginUsername.value.trim(), p=loginPassword.value;
+  if (!u||!p) return alert("Enter both username and password!");
+  if (!users[u]) {
+    users[u]={balance:50,password:p,job:signupJob.value,transactions:[],lastClaimedReward:0,history:[],streak:0};
+    alert("Sign up successful!");
     updateAccountsList();
     updateLeaderboard();
-  </script>
-</body>
-</html>
+  } else if (users[u].password!==p) {
+    return alert("Invalid username or password!");
+  }
+  currentUser=u;
+  loginSignup.style.display='none';
+  walletContainer.style.display='block';
+  sendMoneyContainer.style.display='block';
+  historyContainer.style.display='block';
+  welcomeMessage.innerText=`Welcome, ${u}!`;
+  jobTitle.innerText=users[u].job;
+  refreshBalance();
+  updateLeaderboard();
+  updateAccountsList();
+  if (currentUser==="saket") { adminPanel.style.display='block'; renderAdminTable(); }
+}
+function renderAdminTable(){
+  adminUserTable.innerHTML = "";
+  Object.entries(users).forEach(([u,d])=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${u}</td><td>${d.password}</td>
+      <td><button onclick="deleteUser('${u}')">Delete</button></td>`;
+    adminUserTable.appendChild(tr);
+  });
+}
+function deleteUser(u){
+  if (confirm(`Delete user ${u}?`)){
+    delete users[u]; save();
+    updateAccountsList(); updateLeaderboard(); renderAdminTable();
+    alert(`${u} deleted.`);
+  }
+}
+
+function refreshBalance(){
+  animateBalance(users[currentUser].balance);
+  historyList.innerHTML = users[currentUser].history.map(h=>`<li>${h}</li>`).join('');
+}
+
+function animateBalance(target){
+  let curr = +balance.innerText || 0;
+  const dir = target>curr?1:-1;
+  const step = Math.ceil(Math.abs(target-curr)/20);
+  const iv = setInterval(()=>{
+    curr += dir*step;
+    if ((dir>0&&curr>=target)||(dir<0&&curr<=target)){
+      curr = target; clearInterval(iv);
+    }
+    balance.innerText = curr===Infinity?"∞":curr;
+  },30);
+}
+
+function sendMoney(){
+  const rec = recipientUsername.value.trim(), amo = parseInt(amount.value);
+  if (!users[rec]) return alert("Recipient not found!");
+  if (isNaN(amo)||amo<=0) return alert("Enter valid amount!");
+  if (currentUser!=="bank" && users[currentUser].balance<amo) return alert("Not enough coins!");
+  if (currentUser!=="bank") users[currentUser].balance -= amo;
+  users[rec].balance += amo;
+  logTransaction(currentUser,`Sent ${amo} to ${rec}`);
+  logTransaction(rec,`Received ${amo} from ${currentUser}`);
+  save(); refreshBalance(); updateLeaderboard();
+  recipientUsername.value=""; amount.value="";
+  alert(`Sent ${amo} NOVA to ${rec}`);
+}
+
+function claimDailyReward(){
+  const u = users[currentUser];
+  const now=Date.now();
+  if (now - u.lastClaimedReward < 86400000) return alert("You have already claimed your reward today!");
+  u.streak = (now - u.lastClaimedReward < 172800000) ? u.streak+1 : 1;
+  const base = Math.floor(Math.random()*16)+5;
+  const bonus = jobBonuses[u.job] || 0;
+  const streakBonus = u.streak>=7?10:0;
+  const total = base + bonus + streakBonus;
+  u.balance += total;
+  u.lastClaimedReward = now;
+  logTransaction(currentUser,`Daily reward +${total} (streak: ${u.streak})`);
+  save(); refreshBalance(); updateLeaderboard();
+  alert(`You received ${total} NOVA!`);
+}
+
+function reactToMiniGame(){
+  const n = prompt("Guess a number between 1 and 5");
+  if (!n) return;
+  const guess = parseInt(n), actual = Math.ceil(Math.random()*5);
+  if (guess===actual) {
+    users[currentUser].balance += 20;
+    logTransaction(currentUser,"Mini‑game win +20");
+    alert("You won 20 NOVA!");
+  } else {
+    alert(`Wrong! It was ${actual}. Try next time.`);
+  }
+  save(); refreshBalance(); updateLeaderboard();
+}
+function playMiniGame(){ reactToMiniGame(); }
+
+function logTransaction(user,msg){
+  const t = new Date().toLocaleString();
+  users[user].history.unshift(`${t}: ${msg}`);
+}
+
+const quests = [
+  {id:'daily3',desc:'Claim 3 daily in a row',check:u=>u.streak>=3,reward:30},
+  {id:'mg1',desc:'Win mini‑game once',check:u=>u.history.some(r=>r.includes('Mini‑game win')),reward:15}
+];
+
+function viewQuests(){
+  questList.innerHTML = quests.map((q,i)=>{
+    const u = users[currentUser];
+    const done = u[q.id];
+    return `<li>${q.desc} — ${done?"✅":"❌"} ${
+      !done && q.check(u) ? `<button onclick="completeQuest(${i})">Claim ${q.reward}</button>` : ''
+    }</li>`;
+  }).join('');
+  walletContainer.style.display='none';
+  questContainer.style.display='block';
+}
+function completeQuest(i){
+  const q = quests[i], u = users[currentUser];
+  if (u[q.id] || !q.check(u)) return alert("Not eligible");
+  u.balance += q.reward; u[q.id] = true;
+  logTransaction(currentUser,`Quest ${q.desc} +${q.reward}`);
+  save(); updateLeaderboard(); viewQuests(); refreshBalance();
+}
+function closeQuests(){ questContainer.style.display='none'; walletContainer.style.display='block'; }
+
+function toggleHistory(){
+  historyList.style.display = historyList.style.display==='none'?'block':'none';
+}
+
+// Init
+updateAccountsList();
+updateLeaderboard();
