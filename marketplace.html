@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Marketplace - Nova Coins</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(90deg, #0066cc, #00cc66);
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    .container {
+      margin: 20px auto;
+      max-width: 700px;
+      padding: 20px;
+      background: rgba(0, 50, 100, 0.4);
+      border-radius: 10px;
+    }
+    input, button {
+      margin: 5px;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      background: #00cc99;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #009977;
+    }
+    .item {
+      background: rgba(0, 0, 0, 0.3);
+      margin: 10px 0;
+      padding: 15px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🛒 Nova Coins Marketplace</h1>
+
+  <div class="container" id="loginSection">
+    <h2>Login to Access Marketplace</h2>
+    <input type="text" id="loginUsername" placeholder="Username" />
+    <input type="password" id="loginPassword" placeholder="Password" autocomplete="off" />
+    <button onclick="loginUser()">Log In</button>
+  </div>
+
+  <div class="container" id="marketplaceSection" style="display: none;">
+    <h2>Welcome, <span id="currentUserSpan"></span></h2>
+    <p>Your Balance: <span id="userBalance"></span> NOVA COINS</p>
+
+    <h3>Sell an Item</h3>
+    <input type="text" id="itemName" placeholder="Item Name" />
+    <input type="number" id="itemPrice" placeholder="Price in NOVA" />
+    <button onclick="listItem()">List for Sale</button>
+
+    <h3>Items for Sale</h3>
+    <div id="itemsForSale"></div>
+  </div>
+
+  <script>
+    let users = JSON.parse(localStorage.getItem("users")) || {};
+    let marketplace = JSON.parse(localStorage.getItem("marketplace")) || [];
+    let currentUser = null;
+
+    function loginUser() {
+      const username = document.getElementById("loginUsername").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      if (!users[username] || users[username].password !== password) {
+        alert("Invalid username or password.");
+        return;
+      }
+
+      currentUser = username;
+      document.getElementById("loginSection").style.display = "none";
+      document.getElementById("marketplaceSection").style.display = "block";
+      document.getElementById("currentUserSpan").innerText = currentUser;
+      document.getElementById("userBalance").innerText = users[currentUser].balance === Infinity ? "∞" : users[currentUser].balance;
+
+      renderMarketplace();
+    }
+
+    function listItem() {
+      const name = document.getElementById("itemName").value.trim();
+      const price = parseInt(document.getElementById("itemPrice").value);
+
+      if (!name || isNaN(price) || price <= 0) {
+        alert("Enter a valid item and price.");
+        return;
+      }
+
+      marketplace.push({ seller: currentUser, name, price });
+      localStorage.setItem("marketplace", JSON.stringify(marketplace));
+      renderMarketplace();
+
+      document.getElementById("itemName").value = "";
+      document.getElementById("itemPrice").value = "";
+    }
+
+    function renderMarketplace() {
+      const container = document.getElementById("itemsForSale");
+      container.innerHTML = "";
+
+      if (marketplace.length === 0) {
+        container.innerHTML = "<p>No items listed yet.</p>";
+        return;
+      }
+
+      marketplace.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+          <strong>${item.name}</strong><br/>
+          Price: ${item.price} NOVA<br/>
+          Seller: ${item.seller}<br/>
+          ${item.seller !== currentUser ? `<button onclick="buyItem(${index})">Buy</button>` : "<em>Your item</em>"}
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function buyItem(index) {
+      const item = marketplace[index];
+
+      if (users[currentUser].balance < item.price) {
+        alert("Not enough balance.");
+        return;
+      }
+
+      // Transfer coins
+      users[currentUser].balance -= item.price;
+      users[item.seller].balance += item.price;
+
+      // Remove item from marketplace
+      marketplace.splice(index, 1);
+
+      // Save
+      localStorage.setItem("users", JSON.stringify(users));
+      localStorage.setItem("marketplace", JSON.stringify(marketplace));
+
+      alert("Item purchased successfully!");
+      document.getElementById("userBalance").innerText = users[currentUser].balance;
+      renderMarketplace();
+    }
+  </script>
+</body>
+</html>
