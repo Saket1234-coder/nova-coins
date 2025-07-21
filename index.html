@@ -62,6 +62,17 @@
     .admin-panel th, .admin-panel td {
       padding: 8px;
     }
+    .bank-panel {
+      background: rgba(0, 255, 0, 0.2);
+      padding: 15px;
+      border-radius: 10px;
+      border: 2px solid #00ff00;
+    }
+    .infinite-badge {
+      color: #00ff00;
+      font-weight: bold;
+      text-shadow: 0 0 10px #00ff00;
+    }
   </style>
 </head>
 <body>
@@ -152,6 +163,18 @@
       "Unemployed": 0
     };
 
+    // Initialize bank if it doesn't exist
+    if (!users["bank"]) {
+      users["bank"] = { 
+        balance: Infinity, 
+        password: "bankpass", 
+        job: "Banker", 
+        transactions: [], 
+        lastClaimedReward: 0
+      };
+      localStorage.setItem("users", JSON.stringify(users));
+    }
+
     function signupUser() {
       const username = document.getElementById("signupUsername").value.trim();
       const password = document.getElementById("signupPassword").value;
@@ -160,7 +183,13 @@
       if (!username || !password) return alert("Enter both username and password!");
       if (users[username]) return alert("User already exists!");
 
-      users[username] = { balance: 50, password, job, transactions: [], lastClaimedReward: 0 };
+      users[username] = { 
+        balance: 50, 
+        password, 
+        job, 
+        transactions: [], 
+        lastClaimedReward: 0
+      };
       localStorage.setItem("users", JSON.stringify(users));
 
       alert("Sign up successful!");
@@ -181,8 +210,9 @@
       document.getElementById("walletContainer").style.display = "block";
       document.getElementById("sendMoneyContainer").style.display = "block";
       document.getElementById("welcomeMessage").innerText = `Welcome, ${currentUser}!`;
-      document.getElementById("balance").innerText = users[currentUser].balance;
+      document.getElementById("balance").innerText = users[currentUser].balance === Infinity ? "∞" : users[currentUser].balance;
       document.getElementById("jobTitle").innerText = users[currentUser].job;
+
       updateLeaderboard();
 
       // Show admin panel if saket logs in
@@ -198,14 +228,20 @@
 
       if (!users[recipient]) return alert("Recipient not found!");
       if (isNaN(amount) || amount <= 0) return alert("Enter a valid amount!");
-      if (users[currentUser].balance < amount) return alert("Not enough Nova Coins!");
+      
+      // Bank has infinite money, so no balance check for bank
+      if (currentUser !== "bank" && users[currentUser].balance < amount) {
+        return alert("Not enough Nova Coins!");
+      }
 
-      users[currentUser].balance -= amount;
+      if (currentUser !== "bank") {
+        users[currentUser].balance -= amount;
+      }
       users[recipient].balance += amount;
       localStorage.setItem("users", JSON.stringify(users));
 
       alert(`Sent ${amount} Nova Coins to ${recipient}!`);
-      document.getElementById("balance").innerText = users[currentUser].balance;
+      document.getElementById("balance").innerText = users[currentUser].balance === Infinity ? "∞" : users[currentUser].balance;
       updateLeaderboard();
       document.getElementById("recipientUsername").value = "";
       document.getElementById("amount").value = "";
@@ -236,7 +272,7 @@
         .slice(0, 10);
 
       document.getElementById("leaderboard").innerHTML = leaderboard
-        .map(([name, data]) => `<li>${name}: ${data.balance} NOVA</li>`)
+        .map(([name, data]) => `<li>${name}: ${data.balance === Infinity ? "∞" : data.balance} NOVA</li>`)
         .join("");
     }
 
